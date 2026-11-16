@@ -35,10 +35,8 @@ public class PublicacaoController {
     }
 
     @GetMapping ("/{id}")
-    public Optional<PublicacaoResponse> buscarPorId(@PathVariable Long id) {
-        Optional<PublicacaoResponse> publicacaoResponse = publicacaoService.buscarPorId(id);
-
-        return publicacaoResponse;
+    public PublicacaoResponse buscarPorId(@PathVariable Long id) {
+        return publicacaoService.buscarPorId(id);
     }
 
     @GetMapping ("/listarTodos")

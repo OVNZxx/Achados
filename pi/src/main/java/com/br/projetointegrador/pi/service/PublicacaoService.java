@@ -68,22 +68,25 @@ public class PublicacaoService {
         publicacao.getDescricao(), publicacao.getDataCriacao(), publicacao.getDataOcorrencia(), publicacao.getStatus(), publicacao.getTipo());
     }
 
-    public Optional<PublicacaoResponse> buscarPorId(Long id) {
+    public PublicacaoResponse buscarPorId(Long id) {
         log.info("Buscando publicação por id {id}", id);
-        
-        if(!publicacaoRepository.existsById(id)) {
-            throw new GenericException("Erro! Publicação não existe!", "PUBLI_NOT_FOUND", HttpStatus.NOT_FOUND);
-        }
 
-        Publicacao publicacao = publicacaoRepository.findById(id).orElseThrow();
+        Publicacao publi = publicacaoRepository.findById(id).orElseThrow(() -> new GenericException("Erro! Publicação não existe!", "PUBLI_NOT_FOUND", HttpStatus.NOT_FOUND););
 
-        Usuario usuario = publicacao.getIdUsuario();
-        Local local = publicacao.getIdLocal();
+        Usuario usuario = publi.getIdUsuario();
+        Local local = publi.getIdLocal();
 
-        return publicacaoRepository.findById(id).map(publi -> new PublicacaoResponse(publi.getIdPublicacao(),
-        new UsuarioResponse(usuario.getIdUsuario(), usuario.getNome(), usuario.getPermissao()), 
-        new LocalResponse(local.getIdLocal(), local.getNome()), publi.getNome(), publi.getDescricao(), publi.getDataCriacao(), publi.getDataOcorrencia(),
-        publi.getStatus(), publi.getTipo()));
+        return new PublicacaoResponse(
+            publi.getIdPublicacao(),
+            new UsuarioResponse(usuario.getIdUsuario(), usuario.getNome(), usuario.getPermissao()),
+            new LocalResponse(local.getIdLocal(), local.getNome()),
+            publi.getNome(),
+            publi.getDescricao(),
+            publi.getDataCriacao(),
+            publi.getDataOcorrencia(),
+            publi.getStatus(),
+            publi.getTipo()
+        );
     }
 
 
