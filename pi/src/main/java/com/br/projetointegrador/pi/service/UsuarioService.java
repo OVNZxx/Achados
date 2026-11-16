@@ -51,6 +51,13 @@ public class UsuarioService implements UserDetailsService {
         return new UsuarioResponse(usuario.getIdUsuario(), usuario.getNome(), usuario.getPermissao());
     }
 
+    public UsuarioResponse buscarPorId(Long id) {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new GenericException(
+        "Erro! O usuário não existe!", "USER_NOT_FOUND", HttpStatus.NOT_FOUND));
+        
+        return new UsuarioResponse(usuario);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepository.findByEmail(email);

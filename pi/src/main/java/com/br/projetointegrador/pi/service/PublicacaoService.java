@@ -1,7 +1,5 @@
 package com.br.projetointegrador.pi.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,9 +62,7 @@ public class PublicacaoService {
 
         publicacaoRepository.save(publicacao);
 
-        return new PublicacaoResponse(publicacao.getIdPublicacao(),
-        new UsuarioResponse(usuario.getIdUsuario(), usuario.getNome(), usuario.getPermissao()), new LocalResponse(local.getIdLocal(), local.getNome()), publicacao.getNome(),
-        publicacao.getDescricao(), publicacao.getDataCriacao(), publicacao.getDataOcorrencia(), publicacao.getStatus(), publicacao.getTipo());
+        return new PublicacaoResponse(publicacao);
     }
 
     public PublicacaoResponse buscarPorId(Long id) {
@@ -75,20 +71,7 @@ public class PublicacaoService {
         Publicacao publi = publicacaoRepository.findById(id).orElseThrow(() -> new GenericException("Erro! Publicação não existe!",
         "PUBLI_NOT_FOUND", HttpStatus.NOT_FOUND));
 
-        Usuario usuario = publi.getIdUsuario();
-        Local local = publi.getIdLocal();
-
-        return new PublicacaoResponse(
-            publi.getIdPublicacao(),
-            new UsuarioResponse(usuario.getIdUsuario(), usuario.getNome(), usuario.getPermissao()),
-            new LocalResponse(local.getIdLocal(), local.getNome()),
-            publi.getNome(),
-            publi.getDescricao(),
-            publi.getDataCriacao(),
-            publi.getDataOcorrencia(),
-            publi.getStatus(),
-            publi.getTipo()
-        );
+        return new PublicacaoResponse(publi);
     }
 
 
@@ -133,6 +116,8 @@ public class PublicacaoService {
             throw new GenericException("Você não tem permissão para alterar essa publicação", "ACESSO_NEGADO", HttpStatus.FORBIDDEN);
         }
 
+        log.info("Atualizando publicação do ID: {id}", id);
+
         publi.setIdLocal(local);
         publi.setNome(publicacaoRequest.nome());
         publi.setDataOcorrencia(publicacaoRequest.dataOcorrencia());
@@ -140,16 +125,22 @@ public class PublicacaoService {
         publi.setStatus(publicacaoRequest.status());
         publi.setTipo(publicacaoRequest.tipo());
 
-        return new PublicacaoResponse(
-            publi.getIdPublicacao(),
-            new UsuarioResponse(usuario.getIdUsuario(), usuario.getNome(), usuario.getPermissao()),
-            new LocalResponse(local.getIdLocal(), local.getNome()),
-            publi.getNome(),
-            publi.getDescricao(),
-            publi.getDataCriacao(),
-            publi.getDataOcorrencia(),
-            publi.getStatus(),
-            publi.getTipo()
-        );
+        publicacaoRepository.save(publi);
+
+        return new PublicacaoResponse(publi);
+    }
+
+    public Page<PublicacaoResponse> buscaPorNome(String nome, Pageable pageable) {
+        log.info("Listando todas as publicações com nome parecido com: {nome}", nome);
+
+        Page<Publicacao> publicacoes;
+
+        if(nome != null && !nome.isEmpty()) {
+            publicacoes = publicacaoRepository.findByNomeContainingIgnoreCase(nome, pageable);
+        } else {
+            throw new GenericException("Nenhuma publicação encontrada com esse nome", "PUBLI_NOT_FOUND", HttpStatus.NOT_FOUND);
+        }
+
+        return publicacoes.map(PublicacaoResponse::new);
     }
 }
