@@ -66,7 +66,7 @@ public class PublicacaoService {
     }
 
     public PublicacaoResponse buscarPorId(Long id) {
-        log.info("Buscando publicação por id {id}", id);
+        log.info("Buscando publicação por id {}", id);
 
         Publicacao publi = publicacaoRepository.findById(id).orElseThrow(() -> new GenericException("Erro! Publicação não existe!",
         "PUBLI_NOT_FOUND", HttpStatus.NOT_FOUND));
@@ -95,7 +95,7 @@ public class PublicacaoService {
             throw new GenericException("Você não tem permissão para alterar essa publicação", "ACESSO_NEGADO", HttpStatus.FORBIDDEN);
         }
 
-        log.info("Deletando publicação por id: {id}", id);
+        log.info("Deletando publicação por id: {}", id);
         
         publicacaoRepository.deleteById(id);
     }
@@ -116,7 +116,7 @@ public class PublicacaoService {
             throw new GenericException("Você não tem permissão para alterar essa publicação", "ACESSO_NEGADO", HttpStatus.FORBIDDEN);
         }
 
-        log.info("Atualizando publicação do ID: {id}", id);
+        log.info("Atualizando publicação do ID: {}", id);
 
         publi.setIdLocal(local);
         publi.setNome(publicacaoRequest.nome());
@@ -131,7 +131,7 @@ public class PublicacaoService {
     }
 
     public Page<PublicacaoResponse> buscaPorNome(String nome, Pageable pageable) {
-        log.info("Listando todas as publicações com nome parecido com: {nome}", nome);
+        log.info("Listando todas as publicações com nome parecido com: {}", nome);
 
         Page<Publicacao> publicacoes;
 

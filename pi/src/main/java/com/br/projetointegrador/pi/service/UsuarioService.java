@@ -54,6 +54,8 @@ public class UsuarioService implements UserDetailsService {
     public UsuarioResponse buscarPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new GenericException(
         "Erro! O usuário não existe!", "USER_NOT_FOUND", HttpStatus.NOT_FOUND));
+
+        log.info("Buscando usuário por id {}", id);
         
         return new UsuarioResponse(usuario);
     }
