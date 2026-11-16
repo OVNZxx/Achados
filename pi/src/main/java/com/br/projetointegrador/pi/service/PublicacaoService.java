@@ -71,7 +71,8 @@ public class PublicacaoService {
     public PublicacaoResponse buscarPorId(Long id) {
         log.info("Buscando publicação por id {id}", id);
 
-        Publicacao publi = publicacaoRepository.findById(id).orElseThrow(() -> new GenericException("Erro! Publicação não existe!", "PUBLI_NOT_FOUND", HttpStatus.NOT_FOUND););
+        Publicacao publi = publicacaoRepository.findById(id).orElseThrow(() -> new GenericException("Erro! Publicação não existe!",
+        "PUBLI_NOT_FOUND", HttpStatus.NOT_FOUND));
 
         Usuario usuario = publi.getIdUsuario();
         Local local = publi.getIdLocal();
