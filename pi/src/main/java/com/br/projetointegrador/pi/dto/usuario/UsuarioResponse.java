@@ -1,6 +1,7 @@
 package com.br.projetointegrador.pi.dto.usuario;
 
 import com.br.projetointegrador.pi.enumerators.Permissao;
+import com.br.projetointegrador.pi.model.Usuario;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -15,4 +16,10 @@ public record UsuarioResponse(
     String nome,
     
     @NotBlank (message = "A permissão não pode estar vazia")
-    Permissao permissao) {}
+    Permissao permissao) {
+
+        public UsuarioResponse(Usuario usuario) {
+            this(usuario.getIdUsuario(), usuario.getNome(), usuario.getPermissao());
+        }
+
+}

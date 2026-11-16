@@ -1,6 +1,10 @@
 package com.br.projetointegrador.pi.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,7 +24,10 @@ import com.br.projetointegrador.pi.repository.LocalRepository;
 import com.br.projetointegrador.pi.repository.PublicacaoRepository;
 import com.br.projetointegrador.pi.repository.UsuarioRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service 
+@Slf4j 
 public class PublicacaoService {
 
     @Autowired 
@@ -51,6 +58,9 @@ public class PublicacaoService {
         publicacao.setStatus(StatusPublicacao.ATIVA);
         publicacao.setTipo(TipoPublicacao.PERDIDO);
 
+
+        log.info("Adicionando publicação...");
+
         publicacaoRepository.save(publicacao);
 
         return new PublicacaoResponse(publicacao.getIdPublicacao(),
@@ -58,4 +68,28 @@ public class PublicacaoService {
         publicacao.getDescricao(), publicacao.getDataCriacao(), publicacao.getDataOcorrencia(), publicacao.getStatus(), publicacao.getTipo());
     }
 
+    public Optional<PublicacaoResponse> buscarPorId(Long id) {
+        log.info("Buscando publicação por id {id}", id);
+        
+        if(!publicacaoRepository.existsById(id)) {
+            throw new GenericException("Erro! Publicação não existe!", "PUBLI_NOT_FOUND", HttpStatus.NOT_FOUND);
+        }
+
+        Publicacao publicacao = publicacaoRepository.findById(id).orElseThrow();
+
+        Usuario usuario = publicacao.getIdUsuario();
+        Local local = publicacao.getIdLocal();
+
+        return publicacaoRepository.findById(id).map(publi -> new PublicacaoResponse(publi.getIdPublicacao(),
+        new UsuarioResponse(usuario.getIdUsuario(), usuario.getNome(), usuario.getPermissao()), 
+        new LocalResponse(local.getIdLocal(), local.getNome()), publi.getNome(), publi.getDescricao(), publi.getDataCriacao(), publi.getDataOcorrencia(),
+        publi.getStatus(), publi.getTipo()));
+    }
+
+
+    public Page<PublicacaoResponse> listarTodos(Pageable pageable) {
+        log.info("Listando todas as publicações");
+        
+        return publicacaoRepository.findAll(pageable).map(PublicacaoResponse::new);
+    }
 }

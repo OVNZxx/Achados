@@ -1,5 +1,7 @@
 package com.br.projetointegrador.pi.dto.local;
 
+import com.br.projetointegrador.pi.model.Local;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -10,4 +12,10 @@ public record LocalResponse(
     Short idLocal,
     @NotBlank (message = "O nome não pode estar vazio")
     String nome
-) {}
+) {
+
+    public LocalResponse(Local local) {
+        this(local.getIdLocal(), local.getNome());
+    }
+
+}
