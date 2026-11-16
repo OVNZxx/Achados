@@ -10,7 +10,6 @@ import com.br.projetointegrador.pi.enumerators.TipoPublicacao;
 import com.br.projetointegrador.pi.model.Publicacao;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public record PublicacaoResponse(
