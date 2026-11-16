@@ -5,9 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.br.projetointegrador.pi.dto.local.LocalResponse;
 import com.br.projetointegrador.pi.dto.publicacao.PublicacaoRequest;
 import com.br.projetointegrador.pi.dto.publicacao.PublicacaoResponse;
 import com.br.projetointegrador.pi.dto.usuario.UsuarioResponse;
+import com.br.projetointegrador.pi.enumerators.StatusPublicacao;
+import com.br.projetointegrador.pi.enumerators.TipoPublicacao;
 import com.br.projetointegrador.pi.exceptions.GenericException;
 import com.br.projetointegrador.pi.model.Local;
 import com.br.projetointegrador.pi.model.Publicacao;
@@ -45,13 +48,13 @@ public class PublicacaoService {
         publicacao.setNome(publicacaoRequest.nome());
         publicacao.setDataOcorrencia(publicacaoRequest.dataOcorrencia());
         publicacao.setDescricao(publicacaoRequest.descricao());
-        publicacao.setStatus(publicacaoRequest.status());
-        publicacao.setTipo(publicacaoRequest.tipo());
+        publicacao.setStatus(StatusPublicacao.ATIVA);
+        publicacao.setTipo(TipoPublicacao.PERDIDO);
 
         publicacaoRepository.save(publicacao);
 
         return new PublicacaoResponse(publicacao.getIdPublicacao(),
-        new UsuarioResponse(usuario.getIdUsuario(), usuario.getNome(), usuario.getPermissao()), local, publicacao.getNome(),
+        new UsuarioResponse(usuario.getIdUsuario(), usuario.getNome(), usuario.getPermissao()), new LocalResponse(local.getIdLocal(), local.getNome()), publicacao.getNome(),
         publicacao.getDescricao(), publicacao.getDataCriacao(), publicacao.getDataOcorrencia(), publicacao.getStatus(), publicacao.getTipo());
     }
 

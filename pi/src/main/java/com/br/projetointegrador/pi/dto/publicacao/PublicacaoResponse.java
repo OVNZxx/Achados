@@ -3,10 +3,10 @@ package com.br.projetointegrador.pi.dto.publicacao;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
+import com.br.projetointegrador.pi.dto.local.LocalResponse;
 import com.br.projetointegrador.pi.dto.usuario.UsuarioResponse;
 import com.br.projetointegrador.pi.enumerators.StatusPublicacao;
 import com.br.projetointegrador.pi.enumerators.TipoPublicacao;
-import com.br.projetointegrador.pi.model.Local;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -23,7 +23,7 @@ public record PublicacaoResponse(
 
     @NotNull (message = "idLocal não pode ser nulo!")
     @NotEmpty (message = "idLocal não pode ser vazio!")
-    Local local,
+    LocalResponse local,
 
     @NotBlank (message = "Nome não pode ser vazio")
     String nome,
