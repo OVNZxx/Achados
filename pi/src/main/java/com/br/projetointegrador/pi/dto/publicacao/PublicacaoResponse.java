@@ -3,6 +3,11 @@ package com.br.projetointegrador.pi.dto.publicacao;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
+import com.br.projetointegrador.pi.dto.usuario.UsuarioResponse;
+import com.br.projetointegrador.pi.enumerators.StatusPublicacao;
+import com.br.projetointegrador.pi.enumerators.TipoPublicacao;
+import com.br.projetointegrador.pi.model.Local;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -14,11 +19,11 @@ public record PublicacaoResponse(
 
     @NotNull (message = "idUsuario não pode ser nulo!")
     @NotEmpty (message = "idUsuario não pode ser vazio!")
-    Long idUsuario,
+    UsuarioResponse Usuario,
 
     @NotNull (message = "idLocal não pode ser nulo!")
     @NotEmpty (message = "idLocal não pode ser vazio!")
-    Short idLocal,
+    Local local,
 
     @NotBlank (message = "Nome não pode ser vazio")
     String nome,
@@ -35,8 +40,8 @@ public record PublicacaoResponse(
     Date dataOcorrencia,
 
     @NotBlank (message = "Status não pode ser vazio")
-    String status,
+    StatusPublicacao status,
     
     @NotBlank (message = "Nome não pode ser vazio")
-    String tipo
+    TipoPublicacao tipo
 ) {}

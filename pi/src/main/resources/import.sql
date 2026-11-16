@@ -1,0 +1,12 @@
+INSERT INTO local (nome) VALUES ('Bloco 1');
+INSERT INTO local (nome) VALUES ('Bloco 2');
+INSERT INTO local (nome) VALUES ('Bloco 3');
+INSERT INTO local (nome) VALUES ('Bloco 4');
+INSERT INTO local (nome) VALUES ('Bloco 5');
+INSERT INTO local (nome) VALUES ('Bloco 6');
+INSERT INTO local (nome) VALUES ('Bloco 7');
+INSERT INTO local (nome) VALUES ('Veterinária');
+INSERT INTO local (nome) VALUES ('Cantina da Unifio');
+INSERT INTO local (nome) VALUES ('Cantina Giovanelli');
+INSERT INTO local (nome) VALUES ('Fonte');
+INSERT INTO local (nome) VALUES ('Outro');

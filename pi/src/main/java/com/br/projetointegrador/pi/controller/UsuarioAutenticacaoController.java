@@ -1,6 +1,8 @@
 package com.br.projetointegrador.pi.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +24,9 @@ public class UsuarioAutenticacaoController {
     private UsuarioService usuarioService;
 
     @PostMapping ("/cadastrar")
-    public UsuarioResponse cadastrar(@Valid @RequestBody UsuarioCadastrarRequest usuarioRequest) {
-        return usuarioService.cadastro(usuarioRequest);
+    public ResponseEntity<UsuarioResponse> cadastrar(@Valid @RequestBody UsuarioCadastrarRequest usuarioRequest) {
+        UsuarioResponse usuarioResponse = usuarioService.cadastro(usuarioRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioResponse);
     }
 
     @GetMapping("/csrf")

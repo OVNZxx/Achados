@@ -43,17 +43,14 @@ public class Publicacao {
     private LocalDateTime dataCriacao;
 
     @NotNull (message = "O campo data de ocorrência não pode ser nulo")
-    @NotBlank (message = "O campo data de ocorrência não pode ser estar vazio")
     private Date dataOcorrencia;
 
     @NotBlank (message = "O campo descrição não pode ser estar vazio")
     private String descricao;
 
     @Enumerated (EnumType.STRING)
-    @NotBlank (message = "O campo status não pode ser estar vazio")
     private StatusPublicacao status;
 
-    @NotBlank (message = "O campo tipo não pode ser estar vazio")
     @Enumerated (EnumType.STRING)
     private TipoPublicacao tipo;
 }
