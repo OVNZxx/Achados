@@ -13,5 +13,5 @@ public interface PublicacaoRepository extends JpaRepository <Publicacao, Long> {
     List<Publicacao> findByNomeContainingIgnoreCase(String nome);
 
     @EntityGraph (attributePaths = {"idUsuario", "idLocal"})
-    Page<Publicacao> findAll(Pageable pageable);
+    Page<Publicacao> findAll(Pageable pageable); // Para evitar o erro N + 1
 }
