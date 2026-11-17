@@ -24,7 +24,9 @@ public class SecurityConfig {
         .authorizeHttpRequests(authReq -> {
             authReq
             .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-            .requestMatchers("/usuario/autenticacao/cadastrar", "/usuario/autenticacao/login", "/usuario/autenticacao/csrf", "/logout")
+            .requestMatchers("/usuario/autenticacao/cadastrar", "/usuario/autenticacao/login", "/usuario/autenticacao/csrf", "/logout", "/v3/api-docs/**",
+            "/swagger-ui/**", "/swagger-ui.html"
+            )
             .permitAll()
             .anyRequest().authenticated();
         })

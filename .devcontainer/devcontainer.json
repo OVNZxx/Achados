@@ -1,0 +1,16 @@
+{
+  "name": "Projeto Integrador - Backend",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/pi",
+  "forwardPorts": [8080],
+  "postCreateCommand": "bash mvnw -DskipTests dependency:go-offline",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "redhat.java",
+        "vscjava.vscode-maven"
+      ]
+    }
+  }
+}
