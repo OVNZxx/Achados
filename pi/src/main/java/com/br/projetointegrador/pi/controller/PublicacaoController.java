@@ -67,4 +67,10 @@ public class PublicacaoController {
 
         return publicacaoResponse;
     }
+
+    @GetMapping ("/minhas")
+    public ResponseEntity<Page<PublicacaoResponse>> listarMinhas(@PageableDefault 
+    (page = 0, size = 5, sort = "idPublicacao") Pageable pageable) {
+        return ResponseEntity.ok(publicacaoService.listarMinhas(pageable));
+    }
 }

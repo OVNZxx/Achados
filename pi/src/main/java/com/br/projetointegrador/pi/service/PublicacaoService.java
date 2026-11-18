@@ -141,4 +141,13 @@ public class PublicacaoService {
 
         return publicacoes.map(PublicacaoResponse::new);
     }
+
+    public Page<PublicacaoResponse> listarMinhas(Pageable pageable) {
+        log.info("Listando todas as publicações de um usuário");
+
+        UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
+
+        return publicacaoRepository.findByidUsuario(usuario, pageable).map(PublicacaoResponse::new);
+    }
 }
