@@ -20,4 +20,9 @@ public class UsuarioController {
     public UsuarioResponse buscarPorId(@PathVariable Long id) {
         return usuarioService.buscarPorId(id);
     }
+
+    @GetMapping ("/me")
+    public UsuarioResponse eu() {
+        return usuarioService.eu();
+    }
 }

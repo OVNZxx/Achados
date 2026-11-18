@@ -2,6 +2,7 @@ package com.br.projetointegrador.pi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -57,6 +58,13 @@ public class UsuarioService implements UserDetailsService {
 
         log.info("Buscando usuário por id {}", id);
         
+        return new UsuarioResponse(usuario);
+    }
+
+    public UsuarioResponse eu() {
+        UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
+
         return new UsuarioResponse(usuario);
     }
 
