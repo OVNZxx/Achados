@@ -1,0 +1,105 @@
+package com.br.projetointegrador.pi.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import com.br.projetointegrador.pi.dto.contato.ContatoRequest;
+import com.br.projetointegrador.pi.dto.contato.ContatoResponse;
+import com.br.projetointegrador.pi.enumerators.Permissao;
+import com.br.projetointegrador.pi.exceptions.GenericException;
+import com.br.projetointegrador.pi.model.Contato;
+import com.br.projetointegrador.pi.model.Usuario;
+import com.br.projetointegrador.pi.model.UsuarioAutenticado;
+import com.br.projetointegrador.pi.repository.ContatoRepository;
+import com.br.projetointegrador.pi.repository.UsuarioRepository;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Service 
+@Slf4j 
+public class ContatoService {
+
+    @Autowired 
+    private ContatoRepository contatoRepository;
+
+    @Autowired 
+    private UsuarioRepository usuarioRepository;
+
+    public ContatoResponse cadastrar(ContatoRequest contatoRequest) {
+        Contato contato = new Contato();
+        UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
+
+        contato.setIdUsuario(usuario);
+        contato.setContato(contatoRequest.contato());
+        
+        log.info("Criando um contato para o usuário: {}", usuario.getNome());
+
+        contatoRepository.save(contato);
+
+        return new ContatoResponse(contato);
+    }
+
+    public List<ContatoResponse> listarTodosPorUsuario() {
+        UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
+
+        List<Contato> contatos = contatoRepository.findByidUsuario(usuario);
+        List<ContatoResponse> listaContatos = new ArrayList<>();
+
+        for(Contato contato : contatos) {
+            listaContatos.add(new ContatoResponse(contato));
+        }
+
+        log.info("Listando todos os contatos para o usuário: {}", usuario.getNome());
+
+        return listaContatos;
+    }
+
+    public ContatoResponse buscarPorId(Long id) {
+        Contato contato = contatoRepository.findById(id).orElseThrow(() -> new GenericException("Contato inexistente", "CONTATO_NOT_FOUND",
+        HttpStatus.NOT_FOUND));
+
+        return new ContatoResponse(contato);
+    }
+
+    public void deletarContatoPorId(Long id) {
+        UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
+        Contato contato = contatoRepository.findById(id).orElseThrow(() -> new GenericException("Contato inexistente", "CONTATO_NOT_FOUND",
+        HttpStatus.NOT_FOUND));
+
+        boolean proprietario = contato.getIdUsuario().getIdUsuario().equals(usuario.getIdUsuario());
+
+        boolean administrador = usuario.getPermissao() == Permissao.ADMIN;
+
+        if(!proprietario && !administrador) {
+            throw new GenericException("Você não tem permissão para alterar essa publicação", "ACESSO_NEGADO", HttpStatus.FORBIDDEN);
+        }
+
+        log.info("Deletando um contato por id! {}", id);
+        
+        contatoRepository.delete(contato);
+    }
+
+    public ContatoResponse editar(Long id, ContatoRequest contatoRequest) {
+        Contato contato = contatoRepository.findById(id).orElseThrow(() -> new GenericException("Contato inexistente", "CONTATO_NOT_FOUND",
+        HttpStatus.NOT_FOUND));
+        UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
+
+        contato.setIdUsuario(usuario);
+        contato.setContato(contatoRequest.contato());
+        
+        log.info("Editando um contato do usuário: {}", usuario.getNome());
+
+        contatoRepository.save(contato);
+
+        return new ContatoResponse(contato);
+    }
+}
