@@ -50,6 +50,11 @@ public class ContatoService {
         Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
 
         List<Contato> contatos = contatoRepository.findByidUsuario(usuario);
+
+        if(contatos.size() >= 3) {
+            throw new GenericException("ERRO! Não são permitidos mais de 3 contatos por usuário", "CONTATOS_SIZE", HttpStatus.CONFLICT);
+        }
+
         List<ContatoResponse> listaContatos = new ArrayList<>();
 
         for(Contato contato : contatos) {
@@ -62,8 +67,18 @@ public class ContatoService {
     }
 
     public ContatoResponse buscarPorId(Long id) {
+        UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
         Contato contato = contatoRepository.findById(id).orElseThrow(() -> new GenericException("Contato inexistente", "CONTATO_NOT_FOUND",
         HttpStatus.NOT_FOUND));
+
+        boolean proprietario = contato.getIdUsuario().getIdUsuario().equals(usuario.getIdUsuario());
+
+        boolean administrador = usuario.getPermissao() == Permissao.ADMIN;
+
+         if(!proprietario && !administrador) {
+            throw new GenericException("Você não tem permissão para altera essa publicação", "ACESSO_NEGADO", HttpStatus.FORBIDDEN);
+        }
 
         return new ContatoResponse(contato);
     }
@@ -79,7 +94,7 @@ public class ContatoService {
         boolean administrador = usuario.getPermissao() == Permissao.ADMIN;
 
         if(!proprietario && !administrador) {
-            throw new GenericException("Você não tem permissão para alterar essa publicação", "ACESSO_NEGADO", HttpStatus.FORBIDDEN);
+            throw new GenericException("Você não tem permissão para alterar essa contato", "ACESSO_NEGADO", HttpStatus.FORBIDDEN);
         }
 
         log.info("Deletando um contato por id! {}", id);
@@ -92,6 +107,14 @@ public class ContatoService {
         HttpStatus.NOT_FOUND));
         UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
+
+        boolean proprietario = contato.getIdUsuario().getIdUsuario().equals(usuario.getIdUsuario());
+
+        boolean administrador = usuario.getPermissao() == Permissao.ADMIN;
+
+        if(!proprietario && !administrador) {
+            throw new GenericException("Você não tem permissão para alterar essa contato", "ACESSO_NEGADO", HttpStatus.FORBIDDEN);
+        }
 
         contato.setIdUsuario(usuario);
         contato.setContato(contatoRequest.contato());
