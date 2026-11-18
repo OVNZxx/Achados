@@ -7,10 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.br.projetointegrador.pi.dto.local.LocalResponse;
 import com.br.projetointegrador.pi.dto.publicacao.PublicacaoRequest;
 import com.br.projetointegrador.pi.dto.publicacao.PublicacaoResponse;
-import com.br.projetointegrador.pi.dto.usuario.UsuarioResponse;
 import com.br.projetointegrador.pi.enumerators.Permissao;
 import com.br.projetointegrador.pi.enumerators.StatusPublicacao;
 import com.br.projetointegrador.pi.enumerators.TipoPublicacao;
@@ -142,5 +140,14 @@ public class PublicacaoService {
         }
 
         return publicacoes.map(PublicacaoResponse::new);
+    }
+
+    public Page<PublicacaoResponse> listarMinhas(Pageable pageable) {
+        log.info("Listando todas as publicações de um usuário");
+
+        UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
+
+        return publicacaoRepository.findByidUsuario(usuario, pageable).map(PublicacaoResponse::new);
     }
 }
