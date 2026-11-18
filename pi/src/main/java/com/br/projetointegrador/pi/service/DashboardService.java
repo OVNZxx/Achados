@@ -1,11 +1,17 @@
 package com.br.projetointegrador.pi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.br.projetointegrador.pi.dto.dashboard.DashboardResponse;
+import com.br.projetointegrador.pi.enumerators.Permissao;
 import com.br.projetointegrador.pi.enumerators.StatusPublicacao;
 import com.br.projetointegrador.pi.enumerators.TipoPublicacao;
+import com.br.projetointegrador.pi.exceptions.GenericException;
+import com.br.projetointegrador.pi.model.Usuario;
+import com.br.projetointegrador.pi.model.UsuarioAutenticado;
 import com.br.projetointegrador.pi.repository.PublicacaoRepository;
 import com.br.projetointegrador.pi.repository.UsuarioRepository;
 
@@ -21,7 +27,7 @@ public class DashboardService {
     @Autowired 
     private PublicacaoRepository publicacaoRepository;
 
-    public DashboardResponse retornarMetricas() {
+    public DashboardResponse retornarMetricas() {        
         log.info("Retornando métricas!");
         
         Long usuariosCadastrados = usuarioRepository.count();

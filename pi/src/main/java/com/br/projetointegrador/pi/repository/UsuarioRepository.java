@@ -6,6 +6,7 @@ import com.br.projetointegrador.pi.model.Usuario;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Usuario findByNome(String nome);
+    
     Usuario findByEmailAndHashSenha(String email, String senha);
 
     Usuario findByEmail(String email);

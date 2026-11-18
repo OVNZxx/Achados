@@ -148,6 +148,6 @@ public class PublicacaoService {
         UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
 
-        return publicacaoRepository.findByidUsuario(usuario, pageable).map(PublicacaoResponse::new);
+        return publicacaoRepository.findByIdUsuario(usuario, pageable).map(PublicacaoResponse::new);
     }
 }
