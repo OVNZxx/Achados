@@ -34,6 +34,11 @@ public class ContatoService {
         Contato contato = new Contato();
         UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
+        List<Contato> contatos = contatoRepository.findByidUsuario(usuario);
+
+        if(contatos.size() >= 3) {
+            throw new GenericException("ERRO! Não são permitidos mais de 3 contatos por usuário", "CONTATOS_SIZE", HttpStatus.CONFLICT);
+        }
 
         contato.setIdUsuario(usuario);
         contato.setContato(contatoRequest.contato());
@@ -50,10 +55,6 @@ public class ContatoService {
         Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
 
         List<Contato> contatos = contatoRepository.findByidUsuario(usuario);
-
-        if(contatos.size() >= 3) {
-            throw new GenericException("ERRO! Não são permitidos mais de 3 contatos por usuário", "CONTATOS_SIZE", HttpStatus.CONFLICT);
-        }
 
         List<ContatoResponse> listaContatos = new ArrayList<>();
 
