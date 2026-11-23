@@ -1,6 +1,7 @@
 package com.br.projetointegrador.pi.service;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
@@ -33,10 +34,12 @@ import com.br.projetointegrador.pi.enumerators.StatusPublicacao;
 import com.br.projetointegrador.pi.enumerators.TipoPublicacao;
 import com.br.projetointegrador.pi.exceptions.GenericException;
 import com.br.projetointegrador.pi.model.Local;
+import com.br.projetointegrador.pi.model.Contato;
 import com.br.projetointegrador.pi.model.Publicacao;
 import com.br.projetointegrador.pi.model.Usuario;
 import com.br.projetointegrador.pi.model.UsuarioAutenticado;
 import com.br.projetointegrador.pi.repository.LocalRepository;
+import com.br.projetointegrador.pi.repository.ContatoRepository;
 import com.br.projetointegrador.pi.repository.PublicacaoRepository;
 import com.br.projetointegrador.pi.repository.UsuarioRepository;
 
@@ -51,6 +54,9 @@ class PublicacaoServiceTest {
 
     @Mock
     private LocalRepository localRepository;
+
+    @Mock
+    private ContatoRepository contatoRepository;
 
     @Mock
     private UsuarioRepository usuarioRepository;
@@ -87,7 +93,8 @@ class PublicacaoServiceTest {
                 "Garrafa preta esquecida no laboratório",
                 dataOcorrencia,
                 StatusPublicacao.ATIVA,
-                TipoPublicacao.PERDIDO
+                TipoPublicacao.PERDIDO,
+                List.of(20L)
         );
 
         Local localMock = new Local();
@@ -99,11 +106,18 @@ class PublicacaoServiceTest {
         usuarioMock.setNome("Vinícius");
         usuarioMock.setEmail("vinicius@email.com");
 
+        Contato contatoMock = new Contato();
+        contatoMock.setIdContato(20L);
+        contatoMock.setIdUsuario(usuarioMock);
+        contatoMock.setContato("11999999999");
+
         when(localRepository.findById((short) 1)).thenReturn(Optional.of(localMock));
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(usuarioAutenticado);
         when(usuarioAutenticado.getUsername()).thenReturn("vinicius@email.com");
         when(usuarioRepository.findByEmail("vinicius@email.com")).thenReturn(usuarioMock);
+        when(contatoRepository.findByIdContatoInAndIdUsuario(List.of(20L), usuarioMock))
+                .thenReturn(List.of(contatoMock));
 
         PublicacaoResponse response = publicacaoService.cadastrar(request);
 
@@ -115,8 +129,11 @@ class PublicacaoServiceTest {
         assertEquals(TipoPublicacao.PERDIDO, response.tipo());
         assertEquals((short) 1, response.local().idLocal());
         assertEquals(10L, response.usuario().idUsuario());
+        assertEquals(1, response.contatos().size());
+        assertEquals(20L, response.contatos().getFirst().idContato());
+        assertEquals("11999999999", response.contatos().getFirst().contato());
 
-        verify(publicacaoRepository, times(1)).save(any(Publicacao.class));
+        verify(publicacaoRepository, times(2)).save(any(Publicacao.class));
     }
 
     @Test
@@ -128,7 +145,8 @@ class PublicacaoServiceTest {
                 "Chaveiro azul",
                 Date.valueOf("2026-11-16"),
                 StatusPublicacao.ATIVA,
-                TipoPublicacao.PERDIDO
+                TipoPublicacao.PERDIDO,
+                List.of()
         );
 
         when(localRepository.findById((short) 99)).thenReturn(Optional.empty());
@@ -155,7 +173,8 @@ class PublicacaoServiceTest {
                 "Caderno universitário",
                 Date.valueOf("2026-11-16"),
                 StatusPublicacao.ATIVA,
-                TipoPublicacao.PERDIDO
+                TipoPublicacao.PERDIDO,
+                List.of()
         );
 
         Local localMock = new Local();
@@ -177,5 +196,70 @@ class PublicacaoServiceTest {
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
 
         verify(publicacaoRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Não deve associar contatos que não pertencem ao usuário da publicação")
+    void deveRejeitarContatoDeOutroUsuario() {
+        PublicacaoRequest request = new PublicacaoRequest(
+                (short) 1,
+                "Caderno",
+                "Caderno universitário",
+                Date.valueOf("2026-11-16"),
+                StatusPublicacao.ATIVA,
+                TipoPublicacao.PERDIDO,
+                List.of(99L)
+        );
+
+        Local localMock = new Local();
+        localMock.setIdLocal((short) 1);
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setIdUsuario(10L);
+
+        when(localRepository.findById((short) 1)).thenReturn(Optional.of(localMock));
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(usuarioAutenticado);
+        when(usuarioAutenticado.getUsername()).thenReturn("vinicius@email.com");
+        when(usuarioRepository.findByEmail("vinicius@email.com")).thenReturn(usuarioMock);
+        when(contatoRepository.findByIdContatoInAndIdUsuario(List.of(99L), usuarioMock)).thenReturn(List.of());
+
+        GenericException exception = assertThrows(GenericException.class,
+                () -> publicacaoService.cadastrar(request));
+
+        assertEquals("CONTATOS_INVALIDOS", exception.getCodigoErro());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        verify(publicacaoRepository, never()).save(any(Publicacao.class));
+    }
+
+    @Test
+    @DisplayName("Deve exigir ao menos um contato por publicação")
+    void deveExigirAoMenosUmContato() {
+        PublicacaoRequest request = new PublicacaoRequest(
+                (short) 1,
+                "Caderno",
+                "Caderno universitário",
+                Date.valueOf("2026-11-16"),
+                StatusPublicacao.ATIVA,
+                TipoPublicacao.PERDIDO,
+                List.of()
+        );
+
+        Local localMock = new Local();
+        localMock.setIdLocal((short) 1);
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setIdUsuario(10L);
+
+        when(localRepository.findById((short) 1)).thenReturn(Optional.of(localMock));
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(usuarioAutenticado);
+        when(usuarioAutenticado.getUsername()).thenReturn("vinicius@email.com");
+        when(usuarioRepository.findByEmail("vinicius@email.com")).thenReturn(usuarioMock);
+
+        GenericException exception = assertThrows(GenericException.class,
+                () -> publicacaoService.cadastrar(request));
+
+        assertEquals("CONTATOS_INVALIDOS", exception.getCodigoErro());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        verify(publicacaoRepository, never()).save(any(Publicacao.class));
     }
 }

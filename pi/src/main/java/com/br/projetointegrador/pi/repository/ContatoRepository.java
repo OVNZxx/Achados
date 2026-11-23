@@ -10,4 +10,6 @@ import com.br.projetointegrador.pi.model.Usuario;
 public interface ContatoRepository extends JpaRepository<Contato, Long> {
     
     List<Contato> findByidUsuario(Usuario idUsuario);
+
+    List<Contato> findByIdContatoInAndIdUsuario(List<Long> idsContato, Usuario idUsuario);
 }

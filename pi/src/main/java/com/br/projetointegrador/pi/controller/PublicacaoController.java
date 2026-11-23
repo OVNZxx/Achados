@@ -50,7 +50,7 @@ public class PublicacaoController {
 
     @GetMapping ("/buscarPorNome")
     public ResponseEntity<Page<PublicacaoResponse>> buscarPorNomeContendo (@RequestParam String nome, @PageableDefault (page = 0, size = 10, sort = "nome") Pageable pageable) {
-        Page<PublicacaoResponse> paginaDePublicacoes = publicacaoService.listarTodos(pageable);
+        Page<PublicacaoResponse> paginaDePublicacoes = publicacaoService.buscaPorNome(nome, pageable);
 
         return ResponseEntity.ok(paginaDePublicacoes);
     }

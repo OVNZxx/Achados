@@ -2,8 +2,10 @@ package com.br.projetointegrador.pi.dto.publicacao;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.br.projetointegrador.pi.dto.local.LocalResponse;
+import com.br.projetointegrador.pi.dto.publicacaoContato.PublicacaoContatoResponse;
 import com.br.projetointegrador.pi.dto.usuario.UsuarioResponse;
 import com.br.projetointegrador.pi.enumerators.StatusPublicacao;
 import com.br.projetointegrador.pi.enumerators.TipoPublicacao;
@@ -38,13 +40,16 @@ public record PublicacaoResponse(
     StatusPublicacao status,
     
     @NotBlank (message = "Nome não pode ser vazio")
-    TipoPublicacao tipo
+    TipoPublicacao tipo,
+
+    List<PublicacaoContatoResponse> contatos
 ) {
 
     public PublicacaoResponse(Publicacao publicacao) {
         this(publicacao.getIdPublicacao(),
         publicacao.getIdUsuario() != null ? new UsuarioResponse(publicacao.getIdUsuario()) : null,
         publicacao.getIdLocal() != null ? new LocalResponse(publicacao.getIdLocal()) : null, publicacao.getNome(),
-        publicacao.getDescricao(), publicacao.getDataCriacao(), publicacao.getDataOcorrencia(), publicacao.getStatus(), publicacao.getTipo());
+        publicacao.getDescricao(), publicacao.getDataCriacao(), publicacao.getDataOcorrencia(), publicacao.getStatus(),
+        publicacao.getTipo(), publicacao.getContatosDisponibilizados().stream().map(PublicacaoContatoResponse::new).toList());
     }
 }
