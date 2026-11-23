@@ -9,7 +9,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200", "https://petrifying-vampire-jr9vw7g4457r3pxgq-4200.app.github.dev")
+                .allowedOrigins("http://localhost:4200", "https://refactored-space-train-4qg4q4q4pj6whqvw-4200.app.github.dev")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("Content-Type", "X-CSRF-TOKEN")
                 .allowCredentials(true);
