@@ -68,18 +68,8 @@ public class ContatoService {
     }
 
     public ContatoResponse buscarPorId(Long id) {
-        UsuarioAutenticado usuarioAutenticado = (UsuarioAutenticado) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Usuario usuario = usuarioRepository.findByEmail(usuarioAutenticado.getUsername());
         Contato contato = contatoRepository.findById(id).orElseThrow(() -> new GenericException("Contato inexistente", "CONTATO_NOT_FOUND",
         HttpStatus.NOT_FOUND));
-
-        boolean proprietario = contato.getIdUsuario().getIdUsuario().equals(usuario.getIdUsuario());
-
-        boolean administrador = usuario.getPermissao() == Permissao.ADMIN;
-
-         if(!proprietario && !administrador) {
-            throw new GenericException("Você não tem permissão para altera essa publicação", "ACESSO_NEGADO", HttpStatus.FORBIDDEN);
-        }
 
         return new ContatoResponse(contato);
     }
