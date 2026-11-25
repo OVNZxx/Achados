@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.br.projetointegrador.pi.dto.local.LocalResponse;
-import com.br.projetointegrador.pi.service.LocalService;
+import com.br.projetointegrador.pi.service.LocalServiceTest;
 
 @RestController 
 @RequestMapping ("/local")
 public class LocalController {
 
     @Autowired 
-    private LocalService localService;
+    private LocalServiceTest localService;
 
     @GetMapping ("/listarTodos")
     public List<LocalResponse> listarTodos() {
